@@ -187,9 +187,9 @@ function initClient() {
     }
 
     function defineResizeObserver() {
-        if (self.ResizeObserver) {
+        if (window.ResizeObserver) {
             define('ResizeObserver', [], function () {
-                return self.ResizeObserver;
+                return window.ResizeObserver;
             });
         } else {
             define('ResizeObserver', ['resize-observer-polyfill'], returnFirstDependency);
@@ -222,6 +222,7 @@ function initClient() {
                 });
                 require(['mouseManager']);
                 require(['focusPreventScroll']);
+                require(['vendorStyles']);
                 require(['autoFocuser'], function(autoFocuser) {
                     autoFocuser.enable();
                 });
@@ -248,8 +249,8 @@ function initClient() {
     }
 
     function onGlobalizeInit(browser, globalize) {
-        if (self.appMode === 'android') {
-            if (self.location.href.toString().toLowerCase().indexOf('start=backgroundsync') !== -1) {
+        if (window.appMode === 'android') {
+            if (window.location.href.toString().toLowerCase().indexOf('start=backgroundsync') !== -1) {
                 return onAppReady(browser);
             }
         }
@@ -384,11 +385,15 @@ function initClient() {
                             return response.text();
                         })
                         .then(function(css) {
-                            // Inject the branding css as a dom element in body so it will take
-                            // precedence over other stylesheets
-                            var style = document.createElement('style');
-                            style.appendChild(document.createTextNode(css));
-                            document.body.appendChild(style);
+                            let style = document.querySelector('#cssBranding');
+                            if (!style) {
+                                // Inject the branding css as a dom element in body so it will take
+                                // precedence over other stylesheets
+                                style = document.createElement('style');
+                                style.id = 'cssBranding';
+                                document.body.appendChild(style);
+                            }
+                            style.textContent = css;
                         })
                         .catch(function(err) {
                             console.warn('Error applying custom css', err);
@@ -400,7 +405,7 @@ function initClient() {
 
     function registerServiceWorker() {
         /* eslint-disable compat/compat */
-        if (navigator.serviceWorker && self.appMode !== 'cordova' && self.appMode !== 'android') {
+        if (navigator.serviceWorker && window.appMode !== 'cordova' && window.appMode !== 'android') {
             try {
                 navigator.serviceWorker.register('serviceworker.js');
             } catch (err) {
@@ -437,7 +442,7 @@ function initClient() {
 
         define('castSenderApiLoader', [componentsPath + '/castSenderApi'], returnFirstDependency);
 
-        if (self.appMode === 'cordova' || self.appMode === 'android' || self.appMode === 'standalone') {
+        if (window.appMode === 'cordova' || window.appMode === 'android' || window.appMode === 'standalone') {
             AppInfo.isNativeApp = true;
         }
 
@@ -521,7 +526,8 @@ function initClient() {
                     'events',
                     'credentialprovider',
                     'connectionManagerFactory',
-                    'appStorage'
+                    'appStorage',
+                    'comicReader'
                 ]
             },
             urlArgs: urlArgs,
@@ -651,6 +657,7 @@ function initClient() {
         });
         define('slideshow', [componentsPath + '/slideshow/slideshow'], returnFirstDependency);
         define('focusPreventScroll', ['legacy/focusPreventScroll'], returnFirstDependency);
+        define('vendorStyles', ['legacy/vendorStyles'], returnFirstDependency);
         define('userdataButtons', [componentsPath + '/userdatabuttons/userdatabuttons'], returnFirstDependency);
         define('listView', [componentsPath + '/listview/listview'], returnFirstDependency);
         define('indicators', [componentsPath + '/indicators/indicators'], returnFirstDependency);

@@ -986,6 +986,10 @@ import 'programStyles';
                 lines = [];
             }
 
+            if (overlayText && showTitle) {
+                lines = [item.Name];
+            }
+
             const addRightTextMargin = isOuterFooter && options.cardLayout && !options.centerText && options.cardFooterAside !== 'none' && layoutManager.mobile;
 
             html += getCardTextLines(lines, cssClass, !options.overlayText, isOuterFooter, options.cardLayout, addRightTextMargin, options.lines);
@@ -1212,8 +1216,8 @@ import 'programStyles';
             if (coveredImage) {
                 cardImageContainerClass += ' coveredImage';
 
-                if (item.MediaType === 'Photo' || item.Type === 'PhotoAlbum' || item.Type === 'Folder' || item.ProgramInfo || item.Type === 'Program' || item.Type === 'Recording') {
-                    cardImageContainerClass += ' coveredImage-noScale';
+                if (item.Type === 'TvChannel') {
+                    cardImageContainerClass += ' coveredImage-contain';
                 }
             }
 
